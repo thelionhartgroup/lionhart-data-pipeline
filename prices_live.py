@@ -9,26 +9,27 @@ EXCEL_PATH = "Macro_Data.xlsx"
 CSV_PATH = "live_prices.csv"
 SHEET_NAME = "Live_Prices"
 
-FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY")
+ALPACA_API_KEY = os.getenv("ALPACA_API_KEY")
+ALPACA_SECRET_KEY = os.getenv("ALPACA_SECRET_KEY")
 
-print("DEBUG: FINNHUB_API_KEY present =", bool(FINNHUB_API_KEY))
+print("DEBUG: ALPACA_API_KEY present =", bool(ALPACA_API_KEY))
 
-if not FINNHUB_API_KEY:
-    raise RuntimeError("FINNHUB_API_KEY is missing. Check GitHub Secrets.")
+if not ALPACA_API_KEY or not ALPACA_SECRET_KEY:
+    raise RuntimeError("Alpaca API credentials are missing. Check GitHub Secrets.")
 
 # ================= FETCH PRICE =================
 def get_price(symbol: str) -> float:
-    url = "https://finnhub.io/api/v1/quote"
-    params = {
-        "symbol": symbol,
-        "token": FINNHUB_API_KEY
+    url = f"https://paper-api.alpaca.markets/v2/stocks/{symbol}/quotes/latest"
+    headers = {
+        "APCA-API-KEY-ID": ALPACA_API_KEY,
+        "APCA-API-SECRET-KEY": ALPACA_SECRET_KEY
     }
 
-    response = requests.get(url, params=params, timeout=10)
+    response = requests.get(url, headers=headers, timeout=10)
     response.raise_for_status()
 
     data = response.json()
-    price = data.get("c")
+    price = data["quote"]["ap"]  # 'ap' is the ask price, adjust if you need bid or another field
 
     if price is None:
         raise ValueError(f"No price returned for symbol: {symbol}")
