@@ -2,7 +2,7 @@ name: Live Market Prices
 
 on:
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '* * * * *'
   workflow_dispatch:
 
 permissions:
