@@ -2,7 +2,7 @@ name: Live Market Prices
 
 on:
   schedule:
-    - cron: '* * * * *'
+    - cron: '* * * * *'   # Run every minute
   workflow_dispatch:
 
 permissions:
@@ -29,7 +29,8 @@ jobs:
 
       - name: Run price script
         env:
-          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
         run: python prices_live.py
 
       - name: Commit Excel updates
