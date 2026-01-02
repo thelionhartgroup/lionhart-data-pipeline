@@ -4,8 +4,8 @@ on:
   schedule:
     - cron: '*/30 * * * *'   # every 30 minutes
   workflow_dispatch:
-  
-  permissions:
+
+permissions:
   contents: write
 
 jobs:
@@ -31,5 +31,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add Macro_Data.xlsx
-          git commit -m "Update live market prices"
+          git commit -m "Update live market prices" || echo "No changes to commit"
           git push
