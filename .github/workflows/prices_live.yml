@@ -1,11 +1,12 @@
 name: Live Market Prices
 
 on:
-permissions:
-  contents: write
   schedule:
     - cron: '*/30 * * * *'   # every 30 minutes
   workflow_dispatch:
+  
+  permissions:
+  contents: write
 
 jobs:
   fetch-prices:
