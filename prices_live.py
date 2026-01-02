@@ -69,6 +69,8 @@ def main():
         f"Live prices updated successfully | "
         f"Symbols updated: {updated_symbols}"
     )
+    print("DEBUG: FINNHUB_API_KEY present =", bool(FINNHUB_API_KEY))
+
 
 # ================= ENTRY POINT =================
 if __name__ == "__main__":
