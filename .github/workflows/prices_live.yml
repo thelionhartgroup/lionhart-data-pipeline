@@ -18,7 +18,11 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - run: python prices_live.py
+      - name: Run price script
+  env:
+    FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+  run: python prices_live.py
+
 
       - name: Commit Excel updates
         run: |
