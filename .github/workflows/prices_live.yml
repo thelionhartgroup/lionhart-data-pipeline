@@ -2,7 +2,7 @@ name: Live Market Prices
 
 on:
   schedule:
-    - cron: '*/30 * * * *'   # every 30 minutes
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -18,6 +18,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # FULL history, REQUIRED for bots
 
       - uses: actions/setup-python@v5
         with:
@@ -30,23 +32,18 @@ jobs:
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
         run: python prices_live.py
 
-                  - name: Commit Excel updates
-                    run: |
+      - name: Commit Excel updates
+        run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
 
-          # Always sync with latest main FIRST
+          # Ensure clean state from latest main
           git fetch origin
           git checkout main
           git reset --hard origin/main
 
-          # Stage changes
           git add Macro_Data.xlsx live_prices.csv
 
-          # Commit only if there are changes
           git commit -m "Update live market prices" || echo "No changes to commit"
 
-          # Push cleanly
           git push origin main
-
-
