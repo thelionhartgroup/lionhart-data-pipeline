@@ -73,5 +73,20 @@ def main():
 
 
 # ================= ENTRY POINT =================
+
 if __name__ == "__main__":
     main()
+import csv
+
+CSV_PATH = "live_prices.csv"
+
+with open(CSV_PATH, "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Symbol", "Price", "Timestamp"])
+
+    for row in range(2, ws.max_row + 1):
+        writer.writerow([
+            ws[f"A{row}"].value,
+            ws[f"B{row}"].value,
+            ws[f"C{row}"].value
+        ])
