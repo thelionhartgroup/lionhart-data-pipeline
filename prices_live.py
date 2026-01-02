@@ -7,7 +7,7 @@ import os
 EXCEL_PATH = "Macro_Data.xlsx"
 SHEET_NAME = "Live_Prices"
 
-FINNHUB_API_KEY = os.getenv("d57bvh1r01qrcrnajck0d57bvh1r01qrcrnajckg")
+FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY")
 
 # ================= FETCH PRICE =================
 def get_price(symbol):
