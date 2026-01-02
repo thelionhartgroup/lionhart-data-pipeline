@@ -19,7 +19,7 @@ if not ALPACA_API_KEY or not ALPACA_SECRET_KEY:
 
 # ================= FETCH PRICE =================
 def get_price(symbol: str) -> float:
-    url = f"https://paper-api.alpaca.markets/v2/stocks/{symbol}/quotes/latest"
+    url = f"https://data.alpaca.markets/v2/stocks/{symbol}/quotes/latest"
     headers = {
         "APCA-API-KEY-ID": ALPACA_API_KEY,
         "APCA-API-SECRET-KEY": ALPACA_SECRET_KEY
