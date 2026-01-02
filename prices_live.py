@@ -29,7 +29,13 @@ def get_price(symbol: str) -> float:
     response.raise_for_status()
 
     data = response.json()
-    price = data["quote"]["ap"]  # 'ap' is the ask price, adjust if you need bid or another field
+
+    quote = data.get("quote")
+    if not quote:
+        raise ValueError(f"No quote data for {symbol}")
+
+    # Ask price (works pre-market & after-hours)
+    price = quote.get("ap") or quote.get("bp")
 
     if price is None:
         raise ValueError(f"No price returned for symbol: {symbol}")
