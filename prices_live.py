@@ -7,37 +7,69 @@ import os
 EXCEL_PATH = "Macro_Data.xlsx"
 SHEET_NAME = "Live_Prices"
 
+# Read API key from GitHub Actions secret
 FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY")
 
-# ================= FETCH PRICE =================
-def get_price(symbol):
-    url = (
-        f"https://finnhub.io/api/v1/quote"
-        f"?symbol={symbol}&token={FINNHUB_API_KEY}"
+# Fail fast if secret is missing
+if not FINNHUB_API_KEY:
+    raise RuntimeError(
+        "FINNHUB_API_KEY is missing. "
+        "Check GitHub Secrets configuration."
     )
-    r = requests.get(url)
-    r.raise_for_status()
-    return r.json()["c"]
+
+# ================= FETCH PRICE =================
+def get_price(symbol: str) -> float:
+    url = "https://finnhub.io/api/v1/quote"
+    params = {
+        "symbol": symbol,
+        "token": FINNHUB_API_KEY
+    }
+
+    response = requests.get(url, params=params, timeout=10)
+    response.raise_for_status()
+
+    data = response.json()
+
+    # Finnhub returns 'c' as the current price
+    price = data.get("c")
+
+    if price is None:
+        raise ValueError(f"No price returned for symbol: {symbol}")
+
+    return price
 
 # ================= MAIN =================
-wb = openpyxl.load_workbook(EXCEL_PATH)
-ws = wb[SHEET_NAME]
+def main():
+    wb = openpyxl.load_workbook(EXCEL_PATH)
+    ws = wb[SHEET_NAME]
 
-timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 
-# Start from row 2 (skip headers)
-for row in range(2, ws.max_row + 1):
-    symbol = ws[f"A{row}"].value
+    updated_symbols = 0
 
-    # Skip empty rows
-    if not symbol:
-        continue
+    # Start from row 2 (skip header)
+    for row in range(2, ws.max_row + 1):
+        symbol = ws[f"A{row}"].value
 
-    price = get_price(symbol)
+        if not symbol:
+            continue
 
-    ws[f"B{row}"] = price
-    ws[f"C{row}"] = timestamp
+        try:
+            price = get_price(symbol)
+            ws[f"B{row}"] = price
+            ws[f"C{row}"] = timestamp
+            updated_symbols += 1
 
-wb.save(EXCEL_PATH)
+        except Exception as e:
+            print(f"Error updating {symbol}: {e}")
 
-print("Live prices updated successfully")
+    wb.save(EXCEL_PATH)
+
+    print(
+        f"Live prices updated successfully | "
+        f"Symbols updated: {updated_symbols}"
+    )
+
+# ================= ENTRY POINT =================
+if __name__ == "__main__":
+    main()
